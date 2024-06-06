@@ -1,7 +1,7 @@
 NAME      = mosquitto_auth_plugin_http
 
-MOSQUITTO = $(HOME)/mosquitto-1.3.5
-INC       = -I. -I$(MOSQUITTO)/lib -I$(MOSQUITTO)/src
+MOSQUITTO = $(HOME)/dev/mosquitto
+INC       = -I. -I$(MOSQUITTO)/lib -I$(MOSQUITTO)/src -I$(MOSQUITTO)/include
 CFLAGS    = -Wall -Werror -fPIC
 #DEBUG     = -DMQAP_DEBUG
 

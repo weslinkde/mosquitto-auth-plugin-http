@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <curl/curl.h>
 
+#include <mosquitto_broker.h>
 #include <mosquitto.h>
 #include <mosquitto_plugin.h>
 
@@ -17,7 +18,7 @@ int mosquitto_auth_plugin_version(void) {
   return MOSQ_AUTH_PLUGIN_VERSION;
 }
 
-int mosquitto_auth_plugin_init(void **user_data, struct mosquitto_auth_opt *auth_opts, int auth_opt_count) {
+int mosquitto_auth_plugin_init(void **user_data, struct mosquitto_opt *auth_opts, int auth_opt_count) {
   int i = 0;
   for (i = 0; i < auth_opt_count; i++) {
 #ifdef MQAP_DEBUG
@@ -43,19 +44,19 @@ int mosquitto_auth_plugin_init(void **user_data, struct mosquitto_auth_opt *auth
   return MOSQ_ERR_SUCCESS;
 }
 
-int mosquitto_auth_plugin_cleanup(void *user_data, struct mosquitto_auth_opt *auth_opts, int auth_opt_count) {
+int mosquitto_auth_plugin_cleanup(void *user_data, struct mosquitto_opt *opts, int opt_count) {
   return MOSQ_ERR_SUCCESS;
 }
 
-int mosquitto_auth_security_init(void *user_data, struct mosquitto_auth_opt *auth_opts, int auth_opt_count, bool reload) {
+int mosquitto_auth_security_init(void *user_data, struct mosquitto_opt *auth_opts, int auth_opt_count, bool reload) {
   return MOSQ_ERR_SUCCESS;
 }
 
-int mosquitto_auth_security_cleanup(void *user_data, struct mosquitto_auth_opt *auth_opts, int auth_opt_count, bool reload) {
+int mosquitto_auth_security_cleanup(void *user_data, struct mosquitto_opt *auth_opts, int auth_opt_count, bool reload) {
   return MOSQ_ERR_SUCCESS;
 }
 
-int mosquitto_auth_unpwd_check(void *user_data, const char *username, const char *password) {
+mosq_plugin_EXPORT int mosquitto_auth_unpwd_check(void *user_data, struct mosquitto *client, const char *username, const char *password) {
   if (username == NULL || password == NULL) {
     return MOSQ_ERR_AUTH;
   }
@@ -125,7 +126,11 @@ int mosquitto_auth_unpwd_check(void *user_data, const char *username, const char
   return (rc == 200 ? MOSQ_ERR_SUCCESS : MOSQ_ERR_AUTH);
 }
 
-int mosquitto_auth_acl_check(void *user_data, const char *clientid, const char *username, const char *topic, int access) {
+//int mosquitto_auth_acl_check(void *user_data, const char *clientid, const char *username, const char *topic, int access)
+mosq_plugin_EXPORT int mosquitto_auth_acl_check(void *user_data, int access, struct mosquitto *client, const struct mosquitto_acl_msg *msg) {
+  const char * username = mosquitto_client_username(client);
+  const char * clientid = mosquitto_client_id(client);
+  const char * topic = msg->topic;
   if (username == NULL) {
     // If the username is NULL then it's an anonymous user, currently we let
     // this pass assuming the admin will disable anonymous users if required.
@@ -212,7 +217,7 @@ int mosquitto_auth_acl_check(void *user_data, const char *clientid, const char *
   return (rc == 200 ? MOSQ_ERR_SUCCESS : MOSQ_ERR_ACL_DENIED);
 }
 
-int mosquitto_auth_psk_key_get(void *user_data, const char *hint, const char *identity, char *key, int max_key_len) {
+mosq_plugin_EXPORT int mosquitto_auth_psk_key_get(void *user_data, struct mosquitto *client, const char *hint, const char *identity, char *key, int max_key_len) {
   return MOSQ_ERR_AUTH;
 }
 

@@ -1,0 +1,9 @@
+{
+    "C_Cpp.default.includePath": [
+        "../mosquitto/include"
+    ],
+    "files.associations": {
+        "*.h": "cpp",
+        "cstdlib": "c"
+    }
+}
