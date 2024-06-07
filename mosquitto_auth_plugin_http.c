@@ -97,6 +97,7 @@ mosq_plugin_EXPORT int mosquitto_auth_unpwd_check(void *user_data, struct mosqui
   	curl_easy_setopt(ch, CURLOPT_URL, http_user_uri);
   	curl_easy_setopt(ch, CURLOPT_POSTFIELDS, data);
   	curl_easy_setopt(ch, CURLOPT_POSTFIELDSIZE, strlen(data));
+    curl_easy_setopt(ch, CURLOPT_USE_SSL, (long)CURLUSESSL_TRY);
 
   	if ((rv = curl_easy_perform(ch)) == CURLE_OK) {
     		curl_easy_getinfo(ch, CURLINFO_RESPONSE_CODE, &rc);
